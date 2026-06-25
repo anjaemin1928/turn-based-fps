@@ -13,7 +13,8 @@ const NOUNS = ["강아지", "고양이", "호랑이", "사자", "토끼", "돼�
 function App() {
   const [gameState, setGameState] = useState('loading'); // loading, login, create_profile, menu, matchmaking, playing
   const [userProfile, setUserProfile] = useState(null);
-  const [generatedName, setGeneratedName] = useState("");
+  const [selectedAdj, setSelectedAdj] = useState(ADJECTIVES[0]);
+  const [selectedNoun, setSelectedNoun] = useState(NOUNS[0]);
   
   // PeerJS states
   const [peerId, setPeerId] = useState(null);
@@ -63,22 +64,23 @@ function App() {
   const generateRandomName = () => {
     const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
     const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
-    setGeneratedName(`${adj} ${noun}`);
+    setSelectedAdj(adj);
+    setSelectedNoun(noun);
   };
 
   const saveProfile = async () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    // 6자리 무작위 시리얼 번호 생성
+    const finalNickname = `${selectedAdj} ${selectedNoun}`;
     const discriminator = Math.floor(100000 + Math.random() * 900000).toString();
     
     const newProfile = {
       uid: user.uid,
-      nickname: generatedName,
+      nickname: finalNickname,
       discriminator: discriminator,
       gold: 0,
-      profilePic: 'default_01', // 향후 프로필 사진 기능 확장용
+      profilePic: 'default_01',
       createdAt: new Date().toISOString()
     };
 
@@ -180,21 +182,38 @@ function App() {
       )}
 
       {gameState === 'create_profile' && (
-        <div className="glass-panel p-10 max-w-md w-full text-center flex flex-col items-center gap-6">
+        <div className="glass-panel p-8 max-w-md w-full text-center flex flex-col items-center gap-6">
           <h2 className="text-2xl font-bold text-white">프로필 생성</h2>
-          <p className="text-slate-400">당신의 멋진 닉네임을 뽑아보세요!</p>
+          <p className="text-slate-400">자신만의 닉네임을 조합해 보세요!</p>
           
-          <div className="bg-slate-800/80 p-6 rounded-xl border border-slate-700 w-full">
-            <div className="text-3xl font-black text-neon-blue mb-2">{generatedName}</div>
-            <div className="text-slate-500 text-sm">#??????</div>
+          <div className="flex gap-2 w-full">
+            <select 
+              value={selectedAdj} 
+              onChange={(e) => setSelectedAdj(e.target.value)}
+              className="flex-1 bg-slate-800 text-white border border-slate-600 rounded-lg p-2 outline-none focus:border-neon-blue"
+            >
+              {ADJECTIVES.map(adj => <option key={adj} value={adj}>{adj}</option>)}
+            </select>
+            <select 
+              value={selectedNoun} 
+              onChange={(e) => setSelectedNoun(e.target.value)}
+              className="flex-1 bg-slate-800 text-white border border-slate-600 rounded-lg p-2 outline-none focus:border-neon-blue"
+            >
+              {NOUNS.map(noun => <option key={noun} value={noun}>{noun}</option>)}
+            </select>
           </div>
 
-          <div className="flex gap-4 w-full mt-4">
+          <div className="bg-slate-800/80 p-6 rounded-xl border border-slate-700 w-full mt-2">
+            <div className="text-3xl font-black text-neon-blue mb-2">{selectedAdj} {selectedNoun}</div>
+            <div className="text-slate-500 text-sm">#?????? (무작위 발급)</div>
+          </div>
+
+          <div className="flex gap-4 w-full mt-2">
             <button 
               onClick={generateRandomName}
               className="glass-button flex-1 flex items-center justify-center gap-2 bg-slate-700/80 hover:bg-slate-600/80"
             >
-              <Dices className="w-5 h-5" /> 다시 뽑기
+              <Dices className="w-5 h-5" /> 랜덤 뽑기
             </button>
             <button 
               onClick={saveProfile}
