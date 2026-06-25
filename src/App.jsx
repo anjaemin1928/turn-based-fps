@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { Crosshair, LogIn, Dices, Settings, Triangle, Square, Hexagon, Octagon, Box, Aperture } from 'lucide-react'
+import { Crosshair, LogIn, Dices, Settings, Search, X } from 'lucide-react'
 import Peer from 'peerjs'
 import { auth, googleProvider, db } from './firebase'
 import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, where, getCountFromServer } from 'firebase/firestore'
 import { findMatch } from './matchmaking'
 import Game from './Game'
 
@@ -18,51 +18,7 @@ const NOUNS = [
   "다람쥐", "오리", "거위", "악어", "하마", "코끼리", "기린", "원숭이", "고릴라", "판다"
 ];
 
-const RankDisplay = ({ rank }) => {
-  let Icon = Triangle;
-  let colorClass = "text-slate-700";
-  let rankName = "전술가 (Tactician)";
-  
-  switch(rank) {
-    case 'TACTICIAN':
-      Icon = Triangle;
-      rankName = "전술가 (Tactician)";
-      break;
-    case 'STRATEGIST':
-      Icon = Square;
-      rankName = "전략가 (Strategist)";
-      break;
-    case 'COMMANDER':
-      Icon = Hexagon;
-      rankName = "사령관 (Commander)";
-      break;
-    case 'DIRECTOR':
-      Icon = Aperture;
-      rankName = "총괄 국장 (Director)";
-      break;
-    case 'MASTER':
-      Icon = Box;
-      rankName = "마스터 (Master)";
-      colorClass = "text-blue-600 drop-shadow-md";
-      break;
-    case 'GRANDMASTER':
-      Icon = Hexagon;
-      rankName = "그랜드마스터 (Grandmaster)";
-      colorClass = "text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]";
-      break;
-    default:
-      Icon = Triangle;
-      rankName = "전술가 (Tactician)";
-      break;
-  }
 
-  return (
-    <span className="flex items-center gap-1.5">
-      <Icon className={`w-4 h-4 ${colorClass}`} strokeWidth={2.5} /> 
-      <span className={`font-bold ${colorClass}`}>{rankName}</span>
-    </span>
-  );
-};
 
 function App() {
   const [gameState, setGameState] = useState('loading'); // loading, login, create_profile, menu, matchmaking, playing
@@ -70,6 +26,10 @@ function App() {
   const [selectedAdj, setSelectedAdj] = useState(ADJECTIVES[0]);
   const [selectedNoun, setSelectedNoun] = useState(NOUNS[0]);
   const localSessionId = useRef(Math.random().toString(36).substring(2, 15));
+  
+  // Rank Checking State
+  const [rankDetails, setRankDetails] = useState(null);
+  const [isCheckingRank, setIsCheckingRank] = useState(false);
   
   // PeerJS states
   const [peerId, setPeerId] = useState(null);
@@ -243,6 +203,42 @@ function App() {
     setGameState('menu');
   };
 
+  const checkRank = async () => {
+    if (!userProfile) return;
+    setIsCheckingRank(true);
+    setRankDetails(null);
+    try {
+      const usersCol = collection(db, 'users');
+      const totalSnap = await getCountFromServer(usersCol);
+      const totalUsers = Math.max(totalSnap.data().count, 1);
+      
+      const higherQuery = query(usersCol, where('mmr', '>', userProfile.mmr || 1000));
+      const higherSnap = await getCountFromServer(higherQuery);
+      const higherUsers = higherSnap.data().count;
+      
+      const myRank = higherUsers + 1;
+      
+      let resultText = "";
+      if (myRank <= 1000) {
+        resultText = `전체 ${myRank}등`;
+      } else {
+        const percent = ((myRank / totalUsers) * 100).toFixed(1);
+        resultText = `상위 ${percent}%`;
+      }
+      
+      setRankDetails({
+        rank: myRank,
+        total: totalUsers,
+        text: resultText
+      });
+    } catch (error) {
+      console.error("Rank check failed:", error);
+      alert("등수 확인에 실패했습니다.");
+    } finally {
+      setIsCheckingRank(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       {gameState === 'loading' && (
@@ -330,7 +326,17 @@ function App() {
                 <div className="h-full bg-blueprint-green" style={{ width: `${userProfile.exp || 0}%` }}></div>
               </div>
               <div className="text-xs mt-2 flex items-center justify-between border-t border-slate-300 pt-2">
-                <RankDisplay rank={userProfile.rank} />
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-700">MMR: {userProfile.mmr || 1000}</span>
+                  <button 
+                    onClick={checkRank}
+                    disabled={isCheckingRank}
+                    className="flex items-center gap-1 text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded font-bold transition-colors disabled:opacity-50"
+                  >
+                    {isCheckingRank ? <div className="w-3 h-3 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></div> : <Search className="w-3 h-3" />}
+                    등수 확인
+                  </button>
+                </div>
                 <button onClick={handleLogout} className="underline font-bold text-slate-600 hover:text-red-600 cursor-pointer">LOGOUT</button>
               </div>
             </div>
@@ -351,6 +357,33 @@ function App() {
               FIND MATCH
             </button>
           </div>
+
+          {/* 랭킹 상세 모달 */}
+          {rankDetails && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+              <div className="bg-white border-2 border-slate-800 rounded p-6 max-w-sm w-full relative shadow-[8px_8px_0px_rgba(30,41,59,1)]">
+                <button 
+                  onClick={() => setRankDetails(null)}
+                  className="absolute top-2 right-2 text-slate-500 hover:text-slate-900"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="text-center">
+                  <h3 className="text-sm font-bold text-slate-500 mb-1">현재 순위 기록</h3>
+                  <div className="text-3xl font-black text-slate-800 mb-4">{rankDetails.text}</div>
+                  <div className="text-sm font-medium text-slate-600 bg-slate-100 p-2 rounded">
+                    총 활성 유저: {rankDetails.total.toLocaleString()}명
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setRankDetails(null)}
+                  className="w-full mt-6 bg-slate-800 text-white font-bold py-2 rounded hover:bg-slate-700"
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
