@@ -279,7 +279,6 @@ function App() {
                 <span className="flex items-center gap-1">
                   <span className="text-sm">🔰</span> 
                   <span className="text-slate-800">{userProfile.rank || 'UNRANKED'}</span>
-                  <span className="text-slate-400 font-normal ml-1">({userProfile.mmr || 1000} MMR)</span>
                 </span>
                 <button onClick={handleLogout} className="underline hover:text-red-600 cursor-pointer">LOGOUT</button>
               </div>
