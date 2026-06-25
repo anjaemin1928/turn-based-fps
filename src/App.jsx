@@ -203,10 +203,15 @@ function App() {
     setGameState('menu');
   };
 
+  const handleMouseEnterMMR = () => {
+    if (!rankDetails && !isCheckingRank) {
+      checkRank();
+    }
+  };
+
   const checkRank = async () => {
     if (!userProfile) return;
     setIsCheckingRank(true);
-    setRankDetails(null);
     try {
       const usersCol = collection(db, 'users');
       const totalSnap = await getCountFromServer(usersCol);
@@ -220,7 +225,7 @@ function App() {
       
       let resultText = "";
       if (myRank <= 1000) {
-        resultText = `전체 ${myRank}등`;
+        resultText = `${myRank}등`;
       } else {
         const percent = ((myRank / totalUsers) * 100).toFixed(1);
         resultText = `상위 ${percent}%`;
@@ -233,7 +238,6 @@ function App() {
       });
     } catch (error) {
       console.error("Rank check failed:", error);
-      alert("등수 확인에 실패했습니다.");
     } finally {
       setIsCheckingRank(false);
     }
@@ -325,19 +329,28 @@ function App() {
               <div className="w-full h-2 bg-slate-200 border border-slate-800 mt-1">
                 <div className="h-full bg-blueprint-green" style={{ width: `${userProfile.exp || 0}%` }}></div>
               </div>
-              <div className="text-xs mt-2 flex items-center justify-between border-t border-slate-300 pt-2">
-                <div className="flex items-center gap-2">
+              <div className="text-xs mt-2 flex items-center justify-between border-t border-slate-300 pt-2 relative">
+                <div 
+                  className="flex items-center gap-2 cursor-help group"
+                  onMouseEnter={handleMouseEnterMMR}
+                >
                   <span className="font-bold text-slate-700">MMR: {userProfile.mmr || 1000}</span>
-                  <button 
-                    onClick={checkRank}
-                    disabled={isCheckingRank}
-                    className="flex items-center gap-1 text-[10px] bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded font-bold transition-colors disabled:opacity-50"
-                  >
-                    {isCheckingRank ? <div className="w-3 h-3 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></div> : <Search className="w-3 h-3" />}
-                    등수 확인
-                  </button>
+                  
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block w-max z-20">
+                    <div className="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded shadow-lg whitespace-nowrap">
+                      {isCheckingRank ? (
+                        <span className="animate-pulse">등수 확인 중...</span>
+                      ) : rankDetails ? (
+                        <span>{rankDetails.text}</span>
+                      ) : (
+                        <span>정보 없음</span>
+                      )}
+                      <div className="absolute top-full left-4 w-2 h-2 bg-slate-800 transform rotate-45 -mt-1"></div>
+                    </div>
+                  </div>
                 </div>
-                <button onClick={handleLogout} className="underline font-bold text-slate-600 hover:text-red-600 cursor-pointer">LOGOUT</button>
+                <button onClick={handleLogout} className="underline font-bold text-slate-600 hover:text-red-600 cursor-pointer relative z-10">LOGOUT</button>
               </div>
             </div>
           </div>
@@ -358,32 +371,6 @@ function App() {
             </button>
           </div>
 
-          {/* 랭킹 상세 모달 */}
-          {rankDetails && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-              <div className="bg-white border-2 border-slate-800 rounded p-6 max-w-sm w-full relative shadow-[8px_8px_0px_rgba(30,41,59,1)]">
-                <button 
-                  onClick={() => setRankDetails(null)}
-                  className="absolute top-2 right-2 text-slate-500 hover:text-slate-900"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-                <div className="text-center">
-                  <h3 className="text-sm font-bold text-slate-500 mb-1">현재 순위 기록</h3>
-                  <div className="text-3xl font-black text-slate-800 mb-4">{rankDetails.text}</div>
-                  <div className="text-sm font-medium text-slate-600 bg-slate-100 p-2 rounded">
-                    총 활성 유저: {rankDetails.total.toLocaleString()}명
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setRankDetails(null)}
-                  className="w-full mt-6 bg-slate-800 text-white font-bold py-2 rounded hover:bg-slate-700"
-                >
-                  확인
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
