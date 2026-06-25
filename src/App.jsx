@@ -3,7 +3,7 @@ import { Crosshair, LogIn, Dices } from 'lucide-react'
 import Peer from 'peerjs'
 import { auth, googleProvider, db } from './firebase'
 import { signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore'
 import { findMatch } from './matchmaking'
 import Game from './Game'
 
@@ -23,6 +23,7 @@ function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [selectedAdj, setSelectedAdj] = useState(ADJECTIVES[0]);
   const [selectedNoun, setSelectedNoun] = useState(NOUNS[0]);
+  const localSessionId = useRef(Math.random().toString(36).substring(2, 15));
   
   // PeerJS states
   const [peerId, setPeerId] = useState(null);
@@ -38,8 +39,9 @@ function App() {
         const userSnap = await getDoc(userDocRef);
 
         if (userSnap.exists()) {
-          // 기존 유저
-          setUserProfile(userSnap.data());
+          // 기존 유저: 접속할 때마다 내 세션 ID로 덮어쓰기 (기존 기기 밀어내기)
+          await updateDoc(userDocRef, { sessionId: localSessionId.current });
+          setUserProfile({ ...userSnap.data(), sessionId: localSessionId.current });
           setGameState('menu');
         } else {
           // 신규 유저
@@ -49,11 +51,30 @@ function App() {
       } else {
         // 로그인 안됨
         setGameState('login');
+        setUserProfile(null);
       }
     });
 
     return () => unsubscribe();
   }, []);
+
+  // 세션 감시용 리스너 (프로필이 생성/로드된 이후부터 작동)
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user || !userProfile) return;
+
+    const userDocRef = doc(db, 'users', user.uid);
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      const data = docSnap.data();
+      // DB의 세션 ID가 내 로컬 세션 ID와 다르면 강제 로그아웃
+      if (data && data.sessionId && data.sessionId !== localSessionId.current) {
+        alert("다른 기기에서 접속하여 로그아웃됩니다.");
+        signOut(auth);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [userProfile]);
 
   const handleGoogleLogin = async () => {
     try {
@@ -89,6 +110,7 @@ function App() {
       discriminator: discriminator,
       gold: 0,
       profilePic: 'default_01',
+      sessionId: localSessionId.current,
       createdAt: new Date().toISOString()
     };
 
