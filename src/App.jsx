@@ -342,8 +342,8 @@ function App() {
                   <span className="font-bold text-slate-700">MMR: {userProfile.mmr || 1000}</span>
                   
                   {/* Tooltip */}
-                  <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block w-max z-20">
-                    <div className="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded shadow-lg whitespace-nowrap">
+                  <div className="absolute top-1/2 left-full -translate-y-1/2 ml-3 hidden group-hover:block w-max z-20">
+                    <div className="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded shadow-lg whitespace-nowrap relative">
                       {isCheckingRank ? (
                         <span className="animate-pulse">등수 확인 중...</span>
                       ) : rankDetails ? (
@@ -351,7 +351,8 @@ function App() {
                       ) : (
                         <span>정보 없음</span>
                       )}
-                      <div className="absolute top-full left-4 w-2 h-2 bg-slate-800 transform rotate-45 -mt-1"></div>
+                      {/* 좌측 화살표 꼬리 */}
+                      <div className="absolute top-1/2 right-full -translate-y-1/2 w-2 h-2 bg-slate-800 transform rotate-45 translate-x-1"></div>
                     </div>
                   </div>
                 </div>
