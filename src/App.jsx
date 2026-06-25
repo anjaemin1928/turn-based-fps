@@ -111,6 +111,8 @@ function App() {
       gold: 0,
       level: 1,
       exp: 0,
+      rank: 'UNRANKED',
+      mmr: 1000,
       profilePic: 'default_01',
       sessionId: localSessionId.current,
       createdAt: new Date().toISOString()
@@ -273,8 +275,12 @@ function App() {
               <div className="w-full h-2 bg-slate-200 border border-slate-800 mt-1">
                 <div className="h-full bg-blueprint-green" style={{ width: `${userProfile.exp || 0}%` }}></div>
               </div>
-              <div className="text-xs font-bold mt-1 text-slate-600 flex items-center justify-between">
-                <span>⭐ RECRUIT</span>
+              <div className="text-xs font-bold mt-2 text-slate-600 flex items-center justify-between border-t border-slate-300 pt-1">
+                <span className="flex items-center gap-1">
+                  <span className="text-sm">🔰</span> 
+                  <span className="text-slate-800">{userProfile.rank || 'UNRANKED'}</span>
+                  <span className="text-slate-400 font-normal ml-1">({userProfile.mmr || 1000} MMR)</span>
+                </span>
                 <button onClick={handleLogout} className="underline hover:text-red-600 cursor-pointer">LOGOUT</button>
               </div>
             </div>
