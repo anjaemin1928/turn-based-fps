@@ -31,6 +31,11 @@ function App() {
   const [rankDetails, setRankDetails] = useState(null);
   const [isCheckingRank, setIsCheckingRank] = useState(false);
   
+  // MMR 변경 시 랭크 캐시 초기화
+  useEffect(() => {
+    setRankDetails(null);
+  }, [userProfile?.mmr]);
+  
   // PeerJS states
   const [peerId, setPeerId] = useState(null);
   const [connection, setConnection] = useState(null);
