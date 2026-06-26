@@ -29,8 +29,8 @@ function App() {
   
   // Camera & Layout states
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const keys = useRef({ w: false, a: false, s: false, d: false });
+  const requestRef = useRef();
 
   const UILayout = {
     profile: { x: -200, y: -160 },
@@ -214,31 +214,53 @@ function App() {
     setGameState('menu');
   };
 
-  const handleMouseDown = (e) => {
-    if (e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
-    setIsDragging(true);
-    setDragStart({ x: e.clientX - cameraPos.x, y: e.clientY - cameraPos.y });
-  };
+  // Smooth WASD Camera Movement
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const key = e.key.toLowerCase();
+      if (['w', 'a', 's', 'd'].includes(key)) {
+        keys.current[key] = true;
+      }
+    };
 
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    setCameraPos({
-      x: e.clientX - dragStart.x,
-      y: e.clientY - dragStart.y
-    });
-  };
+    const handleKeyUp = (e) => {
+      const key = e.key.toLowerCase();
+      if (['w', 'a', 's', 'd'].includes(key)) {
+        keys.current[key] = false;
+      }
+    };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    const speed = 12; // Camera speed
+    const updateCamera = () => {
+      let dx = 0;
+      let dy = 0;
+      if (keys.current.w) dy += speed;
+      if (keys.current.s) dy -= speed;
+      if (keys.current.a) dx += speed;
+      if (keys.current.d) dx -= speed;
+
+      if (dx !== 0 || dy !== 0) {
+        setCameraPos(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+      }
+      requestRef.current = requestAnimationFrame(updateCamera);
+    };
+
+    requestRef.current = requestAnimationFrame(updateCamera);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      cancelAnimationFrame(requestRef.current);
+    };
+  }, []);
 
   return (
     <div 
       className="w-full h-screen overflow-hidden relative select-none"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
       style={{
         backgroundImage: 'linear-gradient(var(--color-blueprint-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-blueprint-line) 1px, transparent 1px)',
         backgroundSize: '40px 40px',
