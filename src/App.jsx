@@ -289,14 +289,14 @@ function App() {
       style={{
         backgroundImage: 'linear-gradient(var(--color-blueprint-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-blueprint-line) 1px, transparent 1px)',
         backgroundSize: '40px 40px',
-        backgroundPosition: `${Math.round(cameraPos.x)}px ${Math.round(cameraPos.y)}px`,
+        backgroundPosition: `${cameraPos.x}px ${cameraPos.y}px`,
         willChange: 'background-position'
       }}
     >
       <div 
         className="absolute top-1/2 left-1/2 w-0 h-0"
         style={{ 
-          transform: `translate(${Math.round(cameraPos.x)}px, ${Math.round(cameraPos.y)}px)`,
+          transform: `translate(${cameraPos.x}px, ${cameraPos.y}px)`,
           willChange: 'transform'
         }}
       >
