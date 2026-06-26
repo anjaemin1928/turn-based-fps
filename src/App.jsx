@@ -238,7 +238,7 @@ function App() {
 
     const maxSpeed = 7; // 속도 제한 (눈 피로도 감소를 위해 기존 12에서 7로 감소)
     const acceleration = 0.5; // 가속도 (스무딩)
-    const friction = 0.7; // 마찰력 (키를 뗐을 때 부드러운 감속)
+    const friction = 0.9; // 마찰력 (키를 뗐을 때 부드러운 감속)
 
     const updateCamera = () => {
       let accelX = 0;
