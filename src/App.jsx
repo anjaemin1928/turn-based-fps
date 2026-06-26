@@ -214,7 +214,9 @@ function App() {
     setGameState('menu');
   };
 
-  // Smooth WASD Camera Movement
+  // Smooth WASD Camera Movement with Momentum
+  const velocity = useRef({ x: 0, y: 0 });
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -234,17 +236,40 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
-    const speed = 12; // Camera speed
-    const updateCamera = () => {
-      let dx = 0;
-      let dy = 0;
-      if (keys.current.w) dy += speed;
-      if (keys.current.s) dy -= speed;
-      if (keys.current.a) dx += speed;
-      if (keys.current.d) dx -= speed;
+    const maxSpeed = 7; // 속도 제한 (눈 피로도 감소를 위해 기존 12에서 7로 감소)
+    const acceleration = 0.6; // 가속도 (스무딩)
+    const friction = 0.85; // 마찰력 (키를 뗐을 때 부드러운 감속)
 
-      if (dx !== 0 || dy !== 0) {
-        setCameraPos(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+    const updateCamera = () => {
+      let accelX = 0;
+      let accelY = 0;
+      
+      if (keys.current.w) accelY += acceleration;
+      if (keys.current.s) accelY -= acceleration;
+      if (keys.current.a) accelX += acceleration;
+      if (keys.current.d) accelX -= acceleration;
+
+      velocity.current.x += accelX;
+      velocity.current.y += accelY;
+
+      velocity.current.x *= friction;
+      velocity.current.y *= friction;
+
+      const speed = Math.sqrt(velocity.current.x ** 2 + velocity.current.y ** 2);
+      if (speed > maxSpeed) {
+        const ratio = maxSpeed / speed;
+        velocity.current.x *= ratio;
+        velocity.current.y *= ratio;
+      }
+
+      if (Math.abs(velocity.current.x) < 0.05) velocity.current.x = 0;
+      if (Math.abs(velocity.current.y) < 0.05) velocity.current.y = 0;
+
+      if (velocity.current.x !== 0 || velocity.current.y !== 0) {
+        setCameraPos(prev => ({ 
+          x: prev.x + velocity.current.x, 
+          y: prev.y + velocity.current.y 
+        }));
       }
       requestRef.current = requestAnimationFrame(updateCamera);
     };
@@ -264,12 +289,16 @@ function App() {
       style={{
         backgroundImage: 'linear-gradient(var(--color-blueprint-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-blueprint-line) 1px, transparent 1px)',
         backgroundSize: '40px 40px',
-        backgroundPosition: `${cameraPos.x}px ${cameraPos.y}px`
+        backgroundPosition: `${Math.round(cameraPos.x)}px ${Math.round(cameraPos.y)}px`,
+        willChange: 'background-position'
       }}
     >
       <div 
         className="absolute top-1/2 left-1/2 w-0 h-0"
-        style={{ transform: `translate(${cameraPos.x}px, ${cameraPos.y}px)` }}
+        style={{ 
+          transform: `translate(${Math.round(cameraPos.x)}px, ${Math.round(cameraPos.y)}px)`,
+          willChange: 'transform'
+        }}
       >
         {gameState === 'loading' && (
           <div 
