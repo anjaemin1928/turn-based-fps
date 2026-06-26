@@ -363,10 +363,10 @@ function App() {
       className="w-full h-screen overflow-hidden relative select-none"
       style={{
         backgroundImage: 'linear-gradient(var(--color-blueprint-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-blueprint-line) 1px, transparent 1px)',
-        backgroundSize: '100px 100px',
+        backgroundSize: '40px 40px',
         backgroundPosition: `${cameraPos.x}px ${cameraPos.y}px`,
-        backgroundPositionX: `calc(50% + ${cameraPos.x}px - 50px)`,
-        backgroundPositionY: `calc(50% + ${cameraPos.y}px - 50px)`,
+        backgroundPositionX: `calc(50% + ${cameraPos.x}px - 20px)`,
+        backgroundPositionY: `calc(50% + ${cameraPos.y}px - 20px)`,
         willChange: 'background-position'
       }}
     >
