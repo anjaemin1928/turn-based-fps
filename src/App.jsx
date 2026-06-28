@@ -50,6 +50,8 @@ function App() {
   const keys = useRef({ w: false, a: false, s: false, d: false });
   const requestRef = useRef();
   const mousePos = useRef({ x: 0, y: 0 });
+  const targetZoom = useRef(1);
+  const currentZoom = useRef(1);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -313,13 +315,42 @@ function App() {
       if (Math.abs(velocity.current.x) < 0.05) velocity.current.x = 0;
       if (Math.abs(velocity.current.y) < 0.05) velocity.current.y = 0;
 
+      let zoomChanged = false;
+      let newZoom = currentZoom.current;
+      let oldZoom = currentZoom.current;
+
+      // Smooth zoom interpolation
+      if (Math.abs(targetZoom.current - currentZoom.current) > 0.0005) {
+        oldZoom = currentZoom.current;
+        currentZoom.current += (targetZoom.current - currentZoom.current) * 0.15;
+        newZoom = currentZoom.current;
+        zoomChanged = true;
+      } else if (targetZoom.current !== currentZoom.current) {
+        oldZoom = currentZoom.current;
+        currentZoom.current = targetZoom.current;
+        newZoom = currentZoom.current;
+        zoomChanged = true;
+      }
+
       const currentlyMoving = velocity.current.x !== 0 || velocity.current.y !== 0;
 
-      if (currentlyMoving) {
-        setCameraPos(prev => ({ 
-          x: prev.x + velocity.current.x, 
-          y: prev.y + velocity.current.y 
-        }));
+      if (currentlyMoving || zoomChanged) {
+        setCameraPos(prev => {
+          let nextX = prev.x;
+          let nextY = prev.y;
+          
+          if (zoomChanged) {
+            // Adjust camera position to keep the center of the screen perfectly still while zooming!
+            nextX *= (newZoom / oldZoom);
+            nextY *= (newZoom / oldZoom);
+          }
+          if (currentlyMoving) {
+            // Adjust WASD pan speed based on zoom so it feels consistent
+            nextX += velocity.current.x / newZoom; 
+            nextY += velocity.current.y / newZoom;
+          }
+          return { x: nextX, y: nextY };
+        });
       } else {
         // 완전히 멈췄을 때 소수점 좌표를 정수로 스냅하여 정지 상태에서의 UI 블러 완벽 방지
         setCameraPos(prev => {
@@ -359,11 +390,19 @@ function App() {
   }, []);
 
   return (
-    <div className="w-full h-screen overflow-hidden relative select-none bg-blueprint-bg">
+    <div 
+      className="w-full h-screen overflow-hidden relative select-none bg-blueprint-bg"
+      onWheel={(e) => {
+        const zoomSensitivity = 0.001;
+        let nextZoom = targetZoom.current - (e.deltaY * zoomSensitivity);
+        nextZoom = Math.max(0.7, Math.min(1.4, nextZoom));
+        targetZoom.current = nextZoom;
+      }}
+    >
       <div 
         className="absolute top-1/2 left-1/2 w-0 h-0"
         style={{ 
-          transform: `translate(${cameraPos.x}px, ${cameraPos.y}px)`,
+          transform: `translate(${cameraPos.x}px, ${cameraPos.y}px) scale(${currentZoom.current})`,
           willChange: 'transform'
         }}
       >
