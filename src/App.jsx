@@ -73,6 +73,14 @@ function App() {
         gridRef.current.style.backgroundSize = `${40 * scale}px ${40 * scale}px`;
         gridRef.current.style.backgroundPosition = `calc(50vw + ${cameraPos.current.x * scale}px) calc(50vh + ${cameraPos.current.y * scale}px)`;
       }
+      if (railLeftRef.current) {
+        railLeftRef.current.style.left = `calc(50vw + ${(-480 + cameraPos.current.x) * scale}px)`;
+        railLeftRef.current.style.width = `${24 * scale}px`;
+      }
+      if (railRightRef.current) {
+        railRightRef.current.style.left = `calc(50vw + ${(880 + cameraPos.current.x) * scale}px)`;
+        railRightRef.current.style.width = `${24 * scale}px`;
+      }
     };
     
     window.addEventListener('mousemove', handleMouseMove);
@@ -115,6 +123,8 @@ function App() {
   })());
   const cameraRef = useRef(null);
   const gridRef = useRef(null);
+  const railLeftRef = useRef(null);
+  const railRightRef = useRef(null);
   const [connection, setConnection] = useState(null);
   const [isHost, setIsHost] = useState(false);
   const peerRef = useRef(null);
@@ -341,6 +351,14 @@ function App() {
           gridRef.current.style.backgroundSize = `${40 * newZoom}px ${40 * newZoom}px`;
           gridRef.current.style.backgroundPosition = `calc(50vw + ${nextX * newZoom}px) calc(50vh + ${nextY * newZoom}px)`;
         }
+        if (railLeftRef.current) {
+          railLeftRef.current.style.left = `calc(50vw + ${(-480 + nextX) * newZoom}px)`;
+          railLeftRef.current.style.width = `${24 * newZoom}px`;
+        }
+        if (railRightRef.current) {
+          railRightRef.current.style.left = `calc(50vw + ${(880 + nextX) * newZoom}px)`;
+          railRightRef.current.style.width = `${24 * newZoom}px`;
+        }
       } else {
         const rx = Math.round(cameraPos.current.x);
         const ry = Math.round(cameraPos.current.y);
@@ -352,6 +370,12 @@ function App() {
           }
           if (gridRef.current) {
             gridRef.current.style.backgroundPosition = `calc(50vw + ${rx * newZoom}px) calc(50vh + ${ry * newZoom}px)`;
+          }
+          if (railLeftRef.current) {
+            railLeftRef.current.style.left = `calc(50vw + ${(-480 + rx) * newZoom}px)`;
+          }
+          if (railRightRef.current) {
+            railRightRef.current.style.left = `calc(50vw + ${(880 + rx) * newZoom}px)`;
           }
         }
       }
@@ -397,6 +421,18 @@ function App() {
         }}
       />
 
+      {/* 기계식 레일 (바깥으로 빼서 보더라인 안티앨리어싱 방지) */}
+      <div 
+        ref={railLeftRef}
+        className="mechanical-rail" 
+        style={{ left: `calc(50vw + ${(-480 + cameraPos.current.x) * currentZoom.current}px)`, width: `${24 * currentZoom.current}px` }} 
+      />
+      <div 
+        ref={railRightRef}
+        className="mechanical-rail" 
+        style={{ left: `calc(50vw + ${(880 + cameraPos.current.x) * currentZoom.current}px)`, width: `${24 * currentZoom.current}px` }} 
+      />
+
       <div 
         ref={cameraRef}
         className="absolute top-1/2 left-1/2 w-0 h-0"
@@ -405,9 +441,7 @@ function App() {
           willChange: 'transform'
         }}
       >
-        {/* 기계식 레일 (좌측: -480px, 우측: 880px) - 유저 도면 기준 중앙에서 17칸(680px) 거리 */}
-        <div className="mechanical-rail" style={{ left: '-480px' }} />
-        <div className="mechanical-rail" style={{ left: '880px' }} />
+
 
         {gameState === 'loading' && (
           <div 
