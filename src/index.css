@@ -51,7 +51,7 @@
   }
   
   .blueprint-btn[data-hovered="true"], .blueprint-btn:hover {
-    @apply shadow-[8px_8px_0px_rgba(51,65,85,1)];
+    @apply shadow-[16px_16px_0px_rgba(51,65,85,1)];
   }
   
   .blueprint-btn:active {
@@ -65,7 +65,7 @@
   }
 
   .blueprint-btn-secondary[data-hovered="true"], .blueprint-btn-secondary:hover {
-    @apply bg-slate-50 shadow-[8px_8px_0px_rgba(51,65,85,1)];
+    @apply bg-slate-50 shadow-[16px_16px_0px_rgba(51,65,85,1)];
   }
   
   .blueprint-btn-secondary:active {
