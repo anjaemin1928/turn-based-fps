@@ -396,9 +396,9 @@ function App() {
           }}
         />
 
-        {/* 기계식 레일 (좌측: -300px, 우측: 700px) */}
-        <div className="mechanical-rail" style={{ left: '-300px' }} />
-        <div className="mechanical-rail" style={{ left: '700px' }} />
+        {/* 기계식 레일 (좌측: -360px, 우측: 720px) - 유저 도면 기준 */}
+        <div className="mechanical-rail" style={{ left: '-360px' }} />
+        <div className="mechanical-rail" style={{ left: '720px' }} />
 
         {gameState === 'loading' && (
           <div 
