@@ -119,43 +119,40 @@ function App() {
     return { x: -px, y: -py };
   })());
   const cameraRef = useRef(null);
-  const gridLeftRef = useRef(null);
-  const gridCenterRef = useRef(null);
-  const gridRightRef = useRef(null);
+  const gridZoneRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
   const railLeftRef = useRef(null);
   const railRightRef = useRef(null);
 
   // 레일 월드 좌표 & 접힘 폭 상수
   const RAIL_LEFT_WORLD = -480;
   const RAIL_RIGHT_WORLD = 880;
-  const FOLD_WIDTH = 24; // 레일 너비 = 접힌 종이 길이
+  const FOLD_SHIFT = 12; // 레일 너비(24px)의 절반 = 양쪽에서 각각 12px씩 당김
+  const MIDPOINT_WORLD = (RAIL_LEFT_WORLD + RAIL_RIGHT_WORLD) / 2; // 200
 
-  // 3구역 그리드 업데이트 헬퍼 (접힘 효과 포함)
+  // 4구역 그리드 업데이트 헬퍼 (양쪽 접힘 효과)
   const updateGridZones = (camX, camY, zoom) => {
     const halfW = window.innerWidth / 2;
     const railLeftX = halfW + (RAIL_LEFT_WORLD + camX) * zoom;
     const railRightX = halfW + (RAIL_RIGHT_WORLD + camX) * zoom;
+    const midpointX = halfW + (MIDPOINT_WORLD + camX) * zoom;
     const bgSize = `${40 * zoom}px ${40 * zoom}px`;
     const bgY = `calc(50vh + ${camY * zoom}px)`;
-
-    // 좌측 구역: 레일 너비만큼 오른쪽으로 당겨짐 (종이 접힘)
-    if (gridLeftRef.current) {
-      gridLeftRef.current.style.backgroundSize = bgSize;
-      gridLeftRef.current.style.backgroundPosition = `calc(50vw + ${(camX + FOLD_WIDTH) * zoom}px) ${bgY}`;
-      gridLeftRef.current.style.clipPath = `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`;
-    }
-    // 중앙 구역: 변화 없음 (기준면)
-    if (gridCenterRef.current) {
-      gridCenterRef.current.style.backgroundSize = bgSize;
-      gridCenterRef.current.style.backgroundPosition = `calc(50vw + ${camX * zoom}px) ${bgY}`;
-      gridCenterRef.current.style.clipPath = `polygon(${railLeftX}px 0, ${railRightX}px 0, ${railRightX}px 100%, ${railLeftX}px 100%)`;
-    }
-    // 우측 구역: 레일 너비만큼 왼쪽으로 당겨짐 (종이 접힘)
-    if (gridRightRef.current) {
-      gridRightRef.current.style.backgroundSize = bgSize;
-      gridRightRef.current.style.backgroundPosition = `calc(50vw + ${(camX - FOLD_WIDTH) * zoom}px) ${bgY}`;
-      gridRightRef.current.style.clipPath = `polygon(${railRightX}px 0, 100% 0, 100% 100%, ${railRightX}px 100%)`;
-    }
+    // 각 구역의 shift 방향: [+12, -12, +12, -12]
+    // 좌측: 오른쪽으로 당김, 중앙좌: 왼쪽으로 당김, 중앙우: 오른쪽으로 당김, 우측: 왼쪽으로 당김
+    const shifts = [FOLD_SHIFT, -FOLD_SHIFT, FOLD_SHIFT, -FOLD_SHIFT];
+    const clips = [
+      `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`,
+      `polygon(${railLeftX}px 0, ${midpointX}px 0, ${midpointX}px 100%, ${railLeftX}px 100%)`,
+      `polygon(${midpointX}px 0, ${railRightX}px 0, ${railRightX}px 100%, ${midpointX}px 100%)`,
+      `polygon(${railRightX}px 0, 100% 0, 100% 100%, ${railRightX}px 100%)`
+    ];
+    gridZoneRefs.forEach((ref, i) => {
+      if (ref.current) {
+        ref.current.style.backgroundSize = bgSize;
+        ref.current.style.backgroundPosition = `calc(50vw + ${(camX + shifts[i]) * zoom}px) ${bgY}`;
+        ref.current.style.clipPath = clips[i];
+      }
+    });
   };
 
   const [connection, setConnection] = useState(null);
@@ -438,18 +435,20 @@ function App() {
     <div 
       className="w-full h-screen overflow-hidden relative select-none bg-blueprint-bg"
     >
-      {/* 3구역 그리드: 레일에서 종이가 Z자로 접혀 바깥쪽이 안으로 당겨지는 효과 */}
-      {[gridLeftRef, gridCenterRef, gridRightRef].map((ref, i) => {
+      {/* 4구역 그리드: 각 레일에서 양쪽으로 12px씩 당겨지는 Z접힘 효과 */}
+      {gridZoneRefs.map((ref, i) => {
         const zoom = currentZoom.current;
         const camX = cameraPos.current.x;
         const camY = cameraPos.current.y;
         const halfW = typeof window !== 'undefined' ? window.innerWidth / 2 : 960;
         const railLeftX = halfW + (-480 + camX) * zoom;
         const railRightX = halfW + (880 + camX) * zoom;
-        const shifts = [24, 0, -24]; // 좌: +24 당김, 중앙: 0, 우: -24 당김
+        const midpointX = halfW + (200 + camX) * zoom;
+        const shifts = [12, -12, 12, -12];
         const clips = [
           `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`,
-          `polygon(${railLeftX}px 0, ${railRightX}px 0, ${railRightX}px 100%, ${railLeftX}px 100%)`,
+          `polygon(${railLeftX}px 0, ${midpointX}px 0, ${midpointX}px 100%, ${railLeftX}px 100%)`,
+          `polygon(${midpointX}px 0, ${railRightX}px 0, ${railRightX}px 100%, ${midpointX}px 100%)`,
           `polygon(${railRightX}px 0, 100% 0, 100% 100%, ${railRightX}px 100%)`
         ];
         return (
