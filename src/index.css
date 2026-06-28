@@ -51,11 +51,11 @@
   }
   
   .blueprint-btn[data-hovered="true"], .blueprint-btn:hover {
-    @apply translate-y-[-2px] translate-x-[-2px] shadow-[8px_8px_0px_rgba(51,65,85,1)];
+    @apply shadow-[8px_8px_0px_rgba(51,65,85,1)];
   }
   
   .blueprint-btn:active {
-    @apply translate-y-[6px] translate-x-[6px] shadow-[0px_0px_0px_rgba(51,65,85,1)];
+    @apply shadow-[0px_0px_0px_rgba(51,65,85,1)];
     @apply transition-all duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)];
   }
 
@@ -65,11 +65,11 @@
   }
 
   .blueprint-btn-secondary[data-hovered="true"], .blueprint-btn-secondary:hover {
-    @apply bg-slate-50 translate-y-[-2px] translate-x-[-2px] shadow-[8px_8px_0px_rgba(51,65,85,1)];
+    @apply bg-slate-50 shadow-[8px_8px_0px_rgba(51,65,85,1)];
   }
   
   .blueprint-btn-secondary:active {
-    @apply bg-slate-200 translate-y-[6px] translate-x-[6px] shadow-[0px_0px_0px_rgba(51,65,85,1)];
+    @apply bg-slate-200 shadow-[0px_0px_0px_rgba(51,65,85,1)];
     @apply transition-all duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)];
   }
 
