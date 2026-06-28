@@ -280,56 +280,10 @@ function App() {
     setGameState('menu');
   };
 
-  // Smooth WASD Camera Movement with Momentum
-  const velocity = useRef({ x: 0, y: 0 });
-
+  // Programmatic Camera Movement (WASD removed by user request)
+  // Target position can be smoothly interpolated here in the future
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      const key = e.key.toLowerCase();
-      if (['w', 'a', 's', 'd'].includes(key)) {
-        keys.current[key] = true;
-      }
-    };
-
-    const handleKeyUp = (e) => {
-      const key = e.key.toLowerCase();
-      if (['w', 'a', 's', 'd'].includes(key)) {
-        keys.current[key] = false;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    const maxSpeed = 4;
-    const acceleration = 0.3;
-    const friction = 0.85;
-
     const updateCamera = () => {
-      let accelX = 0;
-      let accelY = 0;
-      
-      if (keys.current.w) accelY += acceleration;
-      if (keys.current.s) accelY -= acceleration;
-      if (keys.current.a) accelX += acceleration;
-      if (keys.current.d) accelX -= acceleration;
-
-      velocity.current.x += accelX;
-      velocity.current.y += accelY;
-
-      velocity.current.x *= friction;
-      velocity.current.y *= friction;
-
-      const speed = Math.sqrt(velocity.current.x ** 2 + velocity.current.y ** 2);
-      if (speed > maxSpeed) {
-        const ratio = maxSpeed / speed;
-        velocity.current.x *= ratio;
-        velocity.current.y *= ratio;
-      }
-
-      if (Math.abs(velocity.current.x) < 0.05) velocity.current.x = 0;
-      if (Math.abs(velocity.current.y) < 0.05) velocity.current.y = 0;
 
       let zoomChanged = false;
       let newZoom = currentZoom.current;
@@ -348,19 +302,10 @@ function App() {
         zoomChanged = true;
       }
 
-      const currentlyMoving = velocity.current.x !== 0 || velocity.current.y !== 0;
-
-      if (currentlyMoving || zoomChanged) {
+      if (zoomChanged) {
         let nextX = cameraPos.current.x;
         let nextY = cameraPos.current.y;
         
-        if (currentlyMoving) {
-          nextX += velocity.current.x; 
-          nextY += velocity.current.y;
-        }
-        
-        cameraPos.current.x = nextX;
-        cameraPos.current.y = nextY;
         if (cameraRef.current) {
           cameraRef.current.style.transform = `translate(${nextX * newZoom}px, ${nextY * newZoom}px) scale(${newZoom})`;
         }
@@ -396,8 +341,6 @@ function App() {
     requestRef.current = requestAnimationFrame(updateCamera);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
       cancelAnimationFrame(requestRef.current);
     };
   }, []);
