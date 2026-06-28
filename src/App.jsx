@@ -391,7 +391,7 @@ function App() {
         ref={gridRef}
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: 'linear-gradient(var(--color-blueprint-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-blueprint-line) 1px, transparent 1px)',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cline x1='0' y1='0' x2='40' y2='0' stroke='rgba(51,65,85,0.2)' stroke-width='1' vector-effect='non-scaling-stroke' shape-rendering='crispEdges'/%3E%3Cline x1='0' y1='0' x2='0' y2='40' stroke='rgba(51,65,85,0.2)' stroke-width='1' vector-effect='non-scaling-stroke' shape-rendering='crispEdges'/%3E%3C/svg%3E")`,
           backgroundSize: `${40 * currentZoom.current}px ${40 * currentZoom.current}px`,
           backgroundPosition: `calc(50vw + ${cameraPos.current.x * currentZoom.current}px) calc(50vh + ${cameraPos.current.y * currentZoom.current}px)`
         }}
