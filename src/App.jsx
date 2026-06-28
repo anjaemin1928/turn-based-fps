@@ -50,8 +50,8 @@ function App() {
   const keys = useRef({ w: false, a: false, s: false, d: false });
   const requestRef = useRef();
   const mousePos = useRef({ x: 0, y: 0 });
-  const targetZoom = useRef(1);
-  const currentZoom = useRef(1);
+  const targetZoom = useRef(0.7);
+  const currentZoom = useRef(0.7);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
