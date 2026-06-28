@@ -396,9 +396,9 @@ function App() {
           }}
         />
 
-        {/* 기계식 레일 (좌측: -320px, 우측: 720px) - 유저 도면 기준 완벽 대칭 */}
-        <div className="mechanical-rail" style={{ left: '-320px' }} />
-        <div className="mechanical-rail" style={{ left: '720px' }} />
+        {/* 기계식 레일 (좌측: -480px, 우측: 880px) - 유저 도면 기준 중앙에서 17칸(680px) 거리 */}
+        <div className="mechanical-rail" style={{ left: '-480px' }} />
+        <div className="mechanical-rail" style={{ left: '880px' }} />
 
         {gameState === 'loading' && (
           <div 
