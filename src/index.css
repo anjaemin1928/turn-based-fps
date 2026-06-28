@@ -46,7 +46,7 @@
   }
 
   .blueprint-btn {
-    @apply bg-blueprint-green text-white border-2 border-slate-800 shadow-[6px_6px_0px_rgba(51,65,85,1)] px-16 py-5 font-bold text-4xl tracking-widest uppercase cursor-pointer;
+    @apply bg-blueprint-green text-white border-2 border-slate-800 shadow-[10px_10px_0px_rgba(51,65,85,1)] px-16 py-5 font-bold text-4xl tracking-widest uppercase cursor-pointer;
     @apply transition-all duration-[200ms] ease-out;
   }
   
@@ -56,7 +56,7 @@
   }
 
   .blueprint-btn-secondary {
-    @apply bg-white text-slate-800 border-2 border-slate-800 shadow-[6px_6px_0px_rgba(51,65,85,1)] px-5 py-2 font-bold flex items-center gap-2 uppercase cursor-pointer;
+    @apply bg-white text-slate-800 border-2 border-slate-800 shadow-[10px_10px_0px_rgba(51,65,85,1)] px-5 py-2 font-bold flex items-center gap-2 uppercase cursor-pointer;
     @apply transition-all duration-[200ms] ease-out;
   }
 
