@@ -295,10 +295,10 @@ function App() {
       if (target) {
         setTimeout(() => {
           target.removeAttribute('data-pressed');
-        }, 250);
+        }, 120);
       } else {
         document.querySelectorAll('[data-pressed="true"]').forEach(el => {
-          setTimeout(() => el.removeAttribute('data-pressed'), 250);
+          setTimeout(() => el.removeAttribute('data-pressed'), 120);
         });
       }
     };
