@@ -70,8 +70,8 @@
   }
 
   .mechanical-rail {
-    @apply absolute top-[-5000px] bottom-[-5000px] w-[24px] bg-slate-800 border-x-[4px] border-slate-900 shadow-[inset_0_0_15px_rgba(0,0,0,1)];
-    background-image: repeating-linear-gradient(to bottom, transparent, transparent 12px, rgba(0,0,0,0.7) 12px, rgba(0,0,0,0.7) 16px);
+    @apply absolute top-[-5000px] bottom-[-5000px] w-[16px] bg-slate-200 border-x-2 border-slate-800 shadow-[8px_0px_0px_rgba(51,65,85,1)];
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 20px, rgba(30,41,59,1) 20px, rgba(30,41,59,1) 24px);
     transform: translateX(-50%);
     z-index: -5;
   }
