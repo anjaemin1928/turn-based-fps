@@ -69,10 +69,7 @@ function App() {
       if (cameraRef.current) {
         cameraRef.current.style.transform = `translate(${cameraPos.current.x * scale}px, ${cameraPos.current.y * scale}px) scale(${scale})`;
       }
-      if (gridRef.current) {
-        gridRef.current.style.backgroundSize = `${40 * scale}px ${40 * scale}px`;
-        gridRef.current.style.backgroundPosition = `calc(50vw + ${cameraPos.current.x * scale}px) calc(50vh + ${cameraPos.current.y * scale}px)`;
-      }
+      updateGridZones(cameraPos.current.x, cameraPos.current.y, scale);
       if (railLeftRef.current) {
         railLeftRef.current.style.left = `calc(50vw + ${(-480 + cameraPos.current.x) * scale}px)`;
         railLeftRef.current.style.width = `${24 * scale}px`;
@@ -122,9 +119,45 @@ function App() {
     return { x: -px, y: -py };
   })());
   const cameraRef = useRef(null);
-  const gridRef = useRef(null);
+  const gridLeftRef = useRef(null);
+  const gridCenterRef = useRef(null);
+  const gridRightRef = useRef(null);
   const railLeftRef = useRef(null);
   const railRightRef = useRef(null);
+
+  // 레일 월드 좌표 & 접힘 폭 상수
+  const RAIL_LEFT_WORLD = -480;
+  const RAIL_RIGHT_WORLD = 880;
+  const FOLD_WIDTH = 24; // 레일 너비 = 접힌 종이 길이
+
+  // 3구역 그리드 업데이트 헬퍼 (접힘 효과 포함)
+  const updateGridZones = (camX, camY, zoom) => {
+    const halfW = window.innerWidth / 2;
+    const railLeftX = halfW + (RAIL_LEFT_WORLD + camX) * zoom;
+    const railRightX = halfW + (RAIL_RIGHT_WORLD + camX) * zoom;
+    const bgSize = `${40 * zoom}px ${40 * zoom}px`;
+    const bgY = `calc(50vh + ${camY * zoom}px)`;
+
+    // 좌측 구역: 레일 너비만큼 오른쪽으로 당겨짐 (종이 접힘)
+    if (gridLeftRef.current) {
+      gridLeftRef.current.style.backgroundSize = bgSize;
+      gridLeftRef.current.style.backgroundPosition = `calc(50vw + ${(camX + FOLD_WIDTH) * zoom}px) ${bgY}`;
+      gridLeftRef.current.style.clipPath = `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`;
+    }
+    // 중앙 구역: 변화 없음 (기준면)
+    if (gridCenterRef.current) {
+      gridCenterRef.current.style.backgroundSize = bgSize;
+      gridCenterRef.current.style.backgroundPosition = `calc(50vw + ${camX * zoom}px) ${bgY}`;
+      gridCenterRef.current.style.clipPath = `polygon(${railLeftX}px 0, ${railRightX}px 0, ${railRightX}px 100%, ${railLeftX}px 100%)`;
+    }
+    // 우측 구역: 레일 너비만큼 왼쪽으로 당겨짐 (종이 접힘)
+    if (gridRightRef.current) {
+      gridRightRef.current.style.backgroundSize = bgSize;
+      gridRightRef.current.style.backgroundPosition = `calc(50vw + ${(camX - FOLD_WIDTH) * zoom}px) ${bgY}`;
+      gridRightRef.current.style.clipPath = `polygon(${railRightX}px 0, 100% 0, 100% 100%, ${railRightX}px 100%)`;
+    }
+  };
+
   const [connection, setConnection] = useState(null);
   const [isHost, setIsHost] = useState(false);
   const peerRef = useRef(null);
@@ -347,10 +380,7 @@ function App() {
         if (cameraRef.current) {
           cameraRef.current.style.transform = `translate(${nextX * newZoom}px, ${nextY * newZoom}px) scale(${newZoom})`;
         }
-        if (gridRef.current) {
-          gridRef.current.style.backgroundSize = `${40 * newZoom}px ${40 * newZoom}px`;
-          gridRef.current.style.backgroundPosition = `calc(50vw + ${nextX * newZoom}px) calc(50vh + ${nextY * newZoom}px)`;
-        }
+        updateGridZones(nextX, nextY, newZoom);
         if (railLeftRef.current) {
           railLeftRef.current.style.left = `calc(50vw + ${(-480 + nextX) * newZoom}px)`;
           railLeftRef.current.style.width = `${24 * newZoom}px`;
@@ -368,9 +398,7 @@ function App() {
           if (cameraRef.current) {
             cameraRef.current.style.transform = `translate(${rx * newZoom}px, ${ry * newZoom}px) scale(${newZoom})`;
           }
-          if (gridRef.current) {
-            gridRef.current.style.backgroundPosition = `calc(50vw + ${rx * newZoom}px) calc(50vh + ${ry * newZoom}px)`;
-          }
+          updateGridZones(rx, ry, newZoom);
           if (railLeftRef.current) {
             railLeftRef.current.style.left = `calc(50vw + ${(-480 + rx) * newZoom}px)`;
           }
@@ -410,16 +438,34 @@ function App() {
     <div 
       className="w-full h-screen overflow-hidden relative select-none bg-blueprint-bg"
     >
-      {/* 고정 해상도 1px 그리드 (안티앨리어싱 및 굵기 불균형 방지) */}
-      <div 
-        ref={gridRef}
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cline x1='0' y1='0' x2='40' y2='0' stroke='rgba(51,65,85,0.2)' stroke-width='1' vector-effect='non-scaling-stroke' shape-rendering='crispEdges'/%3E%3Cline x1='0' y1='0' x2='0' y2='40' stroke='rgba(51,65,85,0.2)' stroke-width='1' vector-effect='non-scaling-stroke' shape-rendering='crispEdges'/%3E%3C/svg%3E")`,
-          backgroundSize: `${40 * currentZoom.current}px ${40 * currentZoom.current}px`,
-          backgroundPosition: `calc(50vw + ${cameraPos.current.x * currentZoom.current}px) calc(50vh + ${cameraPos.current.y * currentZoom.current}px)`
-        }}
-      />
+      {/* 3구역 그리드: 레일에서 종이가 Z자로 접혀 바깥쪽이 안으로 당겨지는 효과 */}
+      {[gridLeftRef, gridCenterRef, gridRightRef].map((ref, i) => {
+        const zoom = currentZoom.current;
+        const camX = cameraPos.current.x;
+        const camY = cameraPos.current.y;
+        const halfW = typeof window !== 'undefined' ? window.innerWidth / 2 : 960;
+        const railLeftX = halfW + (-480 + camX) * zoom;
+        const railRightX = halfW + (880 + camX) * zoom;
+        const shifts = [24, 0, -24]; // 좌: +24 당김, 중앙: 0, 우: -24 당김
+        const clips = [
+          `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`,
+          `polygon(${railLeftX}px 0, ${railRightX}px 0, ${railRightX}px 100%, ${railLeftX}px 100%)`,
+          `polygon(${railRightX}px 0, 100% 0, 100% 100%, ${railRightX}px 100%)`
+        ];
+        return (
+          <div
+            key={i}
+            ref={ref}
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cline x1='0' y1='0' x2='40' y2='0' stroke='rgba(51,65,85,0.2)' stroke-width='1' vector-effect='non-scaling-stroke' shape-rendering='crispEdges'/%3E%3Cline x1='0' y1='0' x2='0' y2='40' stroke='rgba(51,65,85,0.2)' stroke-width='1' vector-effect='non-scaling-stroke' shape-rendering='crispEdges'/%3E%3C/svg%3E")`,
+              backgroundSize: `${40 * zoom}px ${40 * zoom}px`,
+              backgroundPosition: `calc(50vw + ${(camX + shifts[i]) * zoom}px) calc(50vh + ${camY * zoom}px)`,
+              clipPath: clips[i]
+            }}
+          />
+        );
+      })}
 
       {/* 기계식 레일 (바깥으로 빼서 보더라인 안티앨리어싱 방지) */}
       <div 
