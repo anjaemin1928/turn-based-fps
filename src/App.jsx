@@ -65,7 +65,7 @@ function App() {
   }, []);
 
   const UILayout = {
-    camera: { x: -3.8, y: -3, width: 1000, height: 700, pivot: 'top-left' },
+    camera: { x: -3, y: -3, width: 1000, height: 700, pivot: 'top-left' },
     profile: { x: -3, y: -3, pivot: 'top-left' },
     settings: { x: 5, y: -3, pivot: 'top-right' },
     matchBtn: { x: 0, y: 3, pivot: 'bottom-center' },
