@@ -470,7 +470,7 @@ function App() {
               className="absolute blueprint-box flex items-center gap-4 w-[350px] h-[120px]"
               style={getPixelCoords(UILayout.profile, 350, 120)}
             >
-              <div className="w-20 h-20 bg-slate-200 border-2 border-slate-800 rounded-full flex shrink-0 items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 bg-slate-200 border-4 border-slate-900 rounded-sm shadow-[4px_4px_0_0_rgba(15,23,42,1)] flex shrink-0 items-center justify-center overflow-hidden">
                 <span className="text-4xl">😎</span>
               </div>
               <div className="flex-1">
