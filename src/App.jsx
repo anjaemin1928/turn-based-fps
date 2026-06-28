@@ -50,8 +50,9 @@ function App() {
   const keys = useRef({ w: false, a: false, s: false, d: false });
   const requestRef = useRef();
   const mousePos = useRef({ x: 0, y: 0 });
-  const targetZoom = useRef(0.7);
-  const currentZoom = useRef(0.7);
+  const getScaleFor55Grids = () => (typeof window !== 'undefined' ? window.innerWidth / 2200 : 0.7);
+  const targetZoom = useRef(getScaleFor55Grids());
+  const currentZoom = useRef(getScaleFor55Grids());
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -60,8 +61,22 @@ function App() {
         mousePos.current.y = e.clientY;
       }
     };
+    
+    const handleResize = () => {
+      const scale = getScaleFor55Grids();
+      targetZoom.current = scale;
+      currentZoom.current = scale;
+      if (cameraRef.current) {
+        cameraRef.current.style.transform = `translate(${cameraPos.current.x}px, ${cameraPos.current.y}px) scale(${scale})`;
+      }
+    };
+    
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const UILayout = {
