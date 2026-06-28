@@ -50,10 +50,6 @@
     @apply transition-all duration-[200ms] ease-out;
   }
   
-  .blueprint-btn[data-hovered="true"], .blueprint-btn:hover {
-    @apply shadow-[16px_16px_0px_rgba(51,65,85,1)];
-  }
-  
   .blueprint-btn[data-pressed="true"], .blueprint-btn:active {
     @apply shadow-[0px_0px_0px_rgba(51,65,85,1)];
     @apply transition-all duration-[250ms] ease-[cubic-bezier(0.34,1.56,0.64,1)];
@@ -65,7 +61,7 @@
   }
 
   .blueprint-btn-secondary[data-hovered="true"], .blueprint-btn-secondary:hover {
-    @apply bg-slate-50 shadow-[16px_16px_0px_rgba(51,65,85,1)];
+    @apply bg-slate-50;
   }
   
   .blueprint-btn-secondary[data-pressed="true"], .blueprint-btn-secondary:active {
