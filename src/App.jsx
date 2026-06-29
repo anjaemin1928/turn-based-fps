@@ -42,6 +42,7 @@ function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [selectedAdj, setSelectedAdj] = useState(ADJECTIVES[0]);
   const [selectedNoun, setSelectedNoun] = useState(NOUNS[0]);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const localSessionId = useRef(Math.random().toString(36).substring(2, 15));
   
   // Camera & Layout states
@@ -92,6 +93,7 @@ function App() {
     camera: { x: -3, y: -3, width: 1000, height: 700, pivot: 'top-left' },
     profile: { x: -3, y: -3, pivot: 'top-left' },
     settings: { x: 5, y: -3, pivot: 'top-right' },
+    settingsPanel: { x: 6, y: -3, pivot: 'top-left' },
     matchBtn: { x: 0, y: 3, pivot: 'bottom-center' },
     login: { x: -2, y: -1, pivot: 'center' },
     createProfile: { x: -2, y: -2, pivot: 'center' },
@@ -627,6 +629,7 @@ function App() {
 
             {/* 설정 버튼 */}
             <button 
+              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
               data-ui-interactive="true"
               className="absolute blueprint-btn-secondary w-[150px] h-[50px]"
               style={getPixelCoords(UILayout.settings, 150, 50)}
@@ -634,6 +637,80 @@ function App() {
               <Settings className="w-5 h-5" />
               <span>SETTINGS</span>
             </button>
+
+            {/* 세팅 패널 (우측 레일에 매달림) */}
+            {isSettingsOpen && (
+              <div 
+                className="absolute blueprint-box w-[260px] flex flex-col gap-0"
+                style={{
+                  ...getPixelCoords(UILayout.settingsPanel, 260, 500),
+                  padding: 0,
+                  transform: 'translate(0, 0)'
+                }}
+              >
+                {/* 패널 헤더 */}
+                <div className="flex items-center justify-between border-b-2 border-slate-800 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    <span className="font-bold text-sm uppercase tracking-widest">Settings</span>
+                  </div>
+                  <button 
+                    onClick={() => setIsSettingsOpen(false)}
+                    data-ui-interactive="true"
+                    className="w-6 h-6 flex items-center justify-center border border-slate-800 bg-white data-[hovered=true]:bg-red-100 data-[hovered=true]:border-red-500 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+
+                {/* 사운드 섹션 */}
+                <div className="px-4 py-3 border-b border-slate-300">
+                  <div className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Sound</div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold">Master</span>
+                      <div className="w-[120px] h-2 bg-slate-200 border border-slate-800">
+                        <div className="h-full bg-blueprint-green" style={{ width: '80%' }}></div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold">BGM</span>
+                      <div className="w-[120px] h-2 bg-slate-200 border border-slate-800">
+                        <div className="h-full bg-blueprint-green" style={{ width: '60%' }}></div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold">SFX</span>
+                      <div className="w-[120px] h-2 bg-slate-200 border border-slate-800">
+                        <div className="h-full bg-blueprint-green" style={{ width: '100%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 디스플레이 섹션 */}
+                <div className="px-4 py-3 border-b border-slate-300">
+                  <div className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Display</div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold">Language</span>
+                      <span className="text-sm font-bold text-slate-600">한국어</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 계정 섹션 */}
+                <div className="px-4 py-3">
+                  <div className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Account</div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-bold">Version</span>
+                      <span className="text-xs font-bold text-slate-400">v0.1.0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* 매칭 버튼 */}
             <div 
