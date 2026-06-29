@@ -134,8 +134,8 @@ function App() {
     const midpointX = halfW + (MIDPOINT_WORLD + camX) * zoom;
     const bgSize = `${40 * zoom}px ${40 * zoom}px`;
     const bgY = `calc(50vh + ${camY * zoom}px)`;
-    // 전체적으로 12px 오른쪽 이동 반영
-    const shifts = [8, 24, 24, 0];
+    // 전체적으로 6px 왼쪽 이동 반영 (이전에서 -6)
+    const shifts = [2, 18, 18, -6];
     const clips = [
       `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`,
       `polygon(${railLeftX}px 0, ${midpointX}px 0, ${midpointX}px 100%, ${railLeftX}px 100%)`,
@@ -467,7 +467,7 @@ function App() {
         const railLeftX = halfW + (-480 + camX) * zoom;
         const railRightX = halfW + (880 + camX) * zoom;
         const midpointX = halfW + (200 + camX) * zoom;
-        const shifts = [8, 24, 24, 0];
+        const shifts = [2, 18, 18, -6];
         const clips = [
           `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`,
           `polygon(${railLeftX}px 0, ${midpointX}px 0, ${midpointX}px 100%, ${railLeftX}px 100%)`,
