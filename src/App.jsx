@@ -598,7 +598,7 @@ function App() {
             {/* 유저 프로필 박스 */}
             <div 
               className="absolute blueprint-box flex items-center gap-4 w-[350px] h-[120px]"
-              style={getPixelCoords(UILayout.profile)}
+              style={{ ...getPixelCoords(UILayout.profile), boxShadow: 'none' }}
             >
               <div className="w-20 h-20 bg-slate-200 border-2 border-slate-800 rounded-sm flex shrink-0 items-center justify-center overflow-hidden">
                 <span className="text-4xl">😎</span>
