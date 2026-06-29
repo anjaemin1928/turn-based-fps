@@ -38,6 +38,8 @@ function App() {
   const [selectedAdj, setSelectedAdj] = useState(ADJECTIVES[0]);
   const [selectedNoun, setSelectedNoun] = useState(NOUNS[0]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [volumes, setVolumes] = useState({ master: 80, bgm: 60, sfx: 100 });
+  const [mutes, setMutes] = useState({ master: false, bgm: false, sfx: false });
   const localSessionId = useRef(Math.random().toString(36).substring(2, 15));
   
   // Camera & Layout states
@@ -646,25 +648,28 @@ function App() {
                 {/* 사운드 섹션 */}
                 <div className="px-4 py-3 border-b border-slate-300">
                   <div className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Sound</div>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold">Master</span>
-                      <div className="w-[120px] h-2 bg-slate-200 border border-slate-800">
-                        <div className="h-full bg-blueprint-green" style={{ width: '80%' }}></div>
+                  <div className="flex flex-col gap-3">
+                    {['master', 'bgm', 'sfx'].map(type => (
+                      <div key={type} className="flex items-center gap-2">
+                        <span className="text-sm font-bold uppercase w-14">{type}</span>
+                        <input 
+                          type="range" 
+                          min="0" max="100" 
+                          value={volumes[type]}
+                          onChange={(e) => setVolumes(prev => ({ ...prev, [type]: parseInt(e.target.value) }))}
+                          className="flex-1 blueprint-slider h-2 bg-slate-200 border border-slate-800 appearance-none cursor-pointer"
+                          style={{
+                            background: `linear-gradient(to right, var(--color-blueprint-green) ${volumes[type]}%, #e2e8f0 ${volumes[type]}%)`
+                          }}
+                        />
+                        <button 
+                          onClick={() => setMutes(prev => ({ ...prev, [type]: !prev[type] }))}
+                          className={`w-6 h-6 flex shrink-0 items-center justify-center border-2 border-slate-800 transition-colors ${mutes[type] ? 'bg-red-500' : 'bg-white hover:bg-slate-100'}`}
+                        >
+                          {mutes[type] && <X className="w-4 h-4 text-white" strokeWidth={3} />}
+                        </button>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold">BGM</span>
-                      <div className="w-[120px] h-2 bg-slate-200 border border-slate-800">
-                        <div className="h-full bg-blueprint-green" style={{ width: '60%' }}></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-bold">SFX</span>
-                      <div className="w-[120px] h-2 bg-slate-200 border border-slate-800">
-                        <div className="h-full bg-blueprint-green" style={{ width: '100%' }}></div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
 

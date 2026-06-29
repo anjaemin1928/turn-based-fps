@@ -90,4 +90,23 @@
   .grid-cell[data-hovered="true"] {
     @apply bg-slate-700/40 cursor-pointer border-slate-500;
   }
+
+  .blueprint-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border: 2px solid #1e293b; /* slate-800 */
+    border-radius: 0;
+    cursor: pointer;
+  }
+  
+  .blueprint-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border: 2px solid #1e293b;
+    border-radius: 0;
+    cursor: pointer;
+  }
 }
