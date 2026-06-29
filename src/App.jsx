@@ -134,8 +134,8 @@ function App() {
     const midpointX = halfW + (MIDPOINT_WORLD + camX) * zoom;
     const bgSize = `${40 * zoom}px ${40 * zoom}px`;
     const bgY = `calc(50vh + ${camY * zoom}px)`;
-    // 각 구역의 shift 방향: 좌측바깥(-4), 좌측중앙(+12), 우측중앙(+12), 우측바깥(-12)
-    const shifts = [-4, 12, 12, -12];
+    // 전체적으로 12px 오른쪽 이동 반영
+    const shifts = [8, 24, 24, 0];
     const clips = [
       `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`,
       `polygon(${railLeftX}px 0, ${midpointX}px 0, ${midpointX}px 100%, ${railLeftX}px 100%)`,
@@ -467,7 +467,7 @@ function App() {
         const railLeftX = halfW + (-480 + camX) * zoom;
         const railRightX = halfW + (880 + camX) * zoom;
         const midpointX = halfW + (200 + camX) * zoom;
-        const shifts = [-4, 12, 12, -12];
+        const shifts = [8, 24, 24, 0];
         const clips = [
           `polygon(0 0, ${railLeftX}px 0, ${railLeftX}px 100%, 0 100%)`,
           `polygon(${railLeftX}px 0, ${midpointX}px 0, ${midpointX}px 100%, ${railLeftX}px 100%)`,
