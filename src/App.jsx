@@ -612,11 +612,10 @@ function App() {
                 <div className="w-full h-2 bg-slate-200 border border-slate-800 mt-1">
                   <div className="h-full bg-blueprint-green" style={{ width: `${userProfile.exp || 0}%` }}></div>
                 </div>
-                <div className="text-xs mt-2 flex items-center justify-between border-t border-slate-300 pt-2">
+                <div className="text-xs mt-2 flex items-center border-t border-slate-300 pt-2">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-700">MMR: {userProfile.mmr || 1000}</span>
                   </div>
-                  <button onClick={handleLogout} data-ui-interactive="true" className="underline font-bold text-slate-600 data-[hovered=true]:text-red-600 cursor-pointer relative z-10">LOGOUT</button>
                 </div>
               </div>
             </div>
@@ -689,7 +688,7 @@ function App() {
                       <span className="text-xs font-bold text-slate-400">v0.1.0</span>
                     </div>
                     <button 
-                      onClick={() => alert("로그아웃 되었습니다.")}
+                      onClick={handleLogout}
                       data-ui-interactive="true"
                       className="mt-2 w-full py-2 bg-red-50 text-red-600 border border-red-200 font-bold text-sm tracking-widest uppercase hover:bg-red-100 transition-colors"
                     >
