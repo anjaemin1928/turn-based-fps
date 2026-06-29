@@ -92,8 +92,8 @@ function App() {
   const UILayout = {
     camera: { x: -3, y: -3, width: 1000, height: 700, pivot: 'top-left' },
     profile: { x: -3, y: -3, pivot: 'top-left' },
-    settings: { x: 5, y: -3, pivot: 'top-right' },
-    settingsPanel: { x: 6, y: -3, pivot: 'top-left' },
+    settings: { x: 4, y: -3, pivot: 'top-right' },
+    settingsPanel: { x: 5.8, y: -3, pivot: 'top-right' },
     matchBtn: { x: 0, y: 3, pivot: 'bottom-center' },
     login: { x: -2, y: -1, pivot: 'center' },
     createProfile: { x: -2, y: -2, pivot: 'center' },
@@ -643,9 +643,8 @@ function App() {
               <div 
                 className="absolute blueprint-box w-[260px] flex flex-col gap-0"
                 style={{
-                  ...getPixelCoords(UILayout.settingsPanel, 260, 500),
-                  padding: 0,
-                  transform: 'translate(0, 0)'
+                  ...getPixelCoords(UILayout.settingsPanel, 260, 260),
+                  padding: 0
                 }}
               >
                 {/* 패널 헤더 */}
