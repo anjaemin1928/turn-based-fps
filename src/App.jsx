@@ -665,9 +665,9 @@ function App() {
                         <span className="w-8 text-right font-mono font-bold text-slate-700">{volumes[type]}</span>
                         <button 
                           onClick={() => setAudioEnabled(prev => ({ ...prev, [type]: !prev[type] }))}
-                          className={`w-6 h-6 flex shrink-0 items-center justify-center border-2 border-slate-800 transition-colors ${audioEnabled[type] ? 'bg-blueprint-green' : 'bg-white hover:bg-slate-100'}`}
+                          className={`w-5 h-5 flex shrink-0 items-center justify-center border-2 border-slate-800 transition-colors ${audioEnabled[type] ? 'bg-blueprint-green' : 'bg-white hover:bg-slate-100'}`}
                         >
-                          {audioEnabled[type] && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+                          {audioEnabled[type] && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                         </button>
                       </div>
                     ))}
